@@ -130,14 +130,14 @@ describe('DELETE /todos/:id', () => {
     let hexId = new ObjectID().toHexString();
     request(app)
       .delete(`/todos/${hexId}`)
-      .expect(404)
+      .expect(400)
       .end(done)
   })
 
   it('should return 404 for non-valid object id', (done) => {
     request(app)
       .delete('/todos/123')
-      .expect(404)
+      .expect(400)
       .end(done)
   })
 })
