@@ -46,6 +46,21 @@ app.get('/todos/:id', (req, res) => {
   })
 })
 
+app.delete('/todos/:id', (req, res) => {
+  let id = req.params.id;
+  if (!ObjectID.isValid(id)){
+    return res.status(400).send('Id not valid')
+  }
+  Todo.findByIdAndRemove(id).then((result) => {
+    if (!result) {
+      return res.status(400).send('ID not in the database')
+    }
+    res.status(200).send({result})
+  }).catch((e) => {
+    return res.status(400).send(e)
+  })
+})
+
 app.listen(3000, () => {
   console.log('App started at port 3000')
 });
