@@ -13,5 +13,8 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
     console.log('Error', err)
   })
 
+  // also has the count method which returns the count of number of items
+  // searched. Also, it returns a promise.
+
   db.close(); // to close the connection.
 });
