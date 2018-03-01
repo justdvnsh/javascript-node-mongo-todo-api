@@ -83,8 +83,10 @@ app.patch('/todos/:id', (req, res) => {
     if (!result) {
       return res.status(400).send('ID not in the database')
     }
-    res.status(400).send({result})
-  }).catch(e => res.status(400).send(e))
+    res.status(200).send({result})
+  }).catch((e) => {
+    res.status(400).send(e)
+  })
 })
 
 app.listen(3000, () => {
