@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 
 let  UserSchema = new mongoose.Schema({
@@ -35,14 +35,18 @@ let  UserSchema = new mongoose.Schema({
 })
 
 // to set custom methods.
-UserSchema.methods.generateAuthToken = function() {
+UserSchema.methods.generateAuthToken = function () {
+  let user = this;
   let access = 'auth'; // just a string.
-  let token = jwt.sign({_id: this._id.toHexString(), access}, 'abc123').toString();
+  let token = jwt.sign({
+              _id: user._id.toHexString(),
+              access
+             }, '123456').toString();
 
-  this.tokens.push({access, token})
+  user.tokens.push({access, token})
   // this is the user model we defined above.
   // we return the save method, so that we could chain other promise callbacks .
-  return this.save().then(() => {
+  return user.save().then(() => {
     return token;
   })
 }
