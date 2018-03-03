@@ -7,6 +7,7 @@ const {ObjectID} = require('mongodb');
 let {mongoose} = require('./db/mongoose');
 let {Todo} = require('./models/todo');
 let {Users} = require('./models/users');
+let {authenticate} = require('./middleware/authenticate');
 
 let app = express();
 
@@ -102,16 +103,8 @@ app.post('/users', (req, res) => {
   })
 });
 
-app.get('/users/me', (req, res) => {
-  let token = req.header('x-auth') // we retrieve the token we set before.
-
-  Users.findByToken(token).then((result) => {
-    if (!result) { // i.e. if no user
-      return Promise.reject()
-    }
-
-    res.status(200).send({result})
-  }).catch(e => res.status(401).send(e))
+app.get('/users/me', authenticate,(req, res) => {
+  res.status(200).send(req.user)
 })
 
 app.listen(3000, () => {

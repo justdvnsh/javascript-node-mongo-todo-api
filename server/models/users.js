@@ -84,7 +84,7 @@ UserSchema.statics.findByToken = function(token) {
     '_id': decoded._id,
     'tokens.token': token, // we query using '' when we need to access a child property.i.e. when we use the dot operator.
     'tokens.access': 'auth'
-  })
+   })
 }
 
 let Users = mongoose.model('Users', UserSchema);
