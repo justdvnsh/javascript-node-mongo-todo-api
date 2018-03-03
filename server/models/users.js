@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs')
 
 let  UserSchema = new mongoose.Schema({
   email: {
@@ -86,6 +87,22 @@ UserSchema.statics.findByToken = function(token) {
     'tokens.access': 'auth'
    })
 }
+
+// we set an event listener. This pre event listener, runs the code in the block,
+// before every databse execution.
+UserSchema.pre('save', function(next) { // to run the code before every save event.
+  let user = this;
+  if (user.isModified('password')) { // 'password 'is the user property.
+    bcrypt.genSalt(10, (err, salt) => { // 10 is trhe number of rounds to intentionally make the program slow to prevent brute force.
+      bcrypt.hash(user.password, salt, (err, hash) => {
+        user.password = hash
+        next()
+      })
+    })
+  } else {
+    next();
+  }
+})
 
 let Users = mongoose.model('Users', UserSchema);
 
