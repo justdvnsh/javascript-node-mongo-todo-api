@@ -102,6 +102,18 @@ app.post('/users', (req, res) => {
   })
 });
 
+app.get('/users/me', (req, res) => {
+  let token = req.header('x-auth') // we retrieve the token we set before.
+
+  Users.findByToken(token).then((result) => {
+    if (!result) { // i.e. if no user
+      return Promise.reject()
+    }
+
+    res.status(200).send({result})
+  }).catch(e => res.status(401).send(e))
+})
+
 app.listen(3000, () => {
   console.log('App started at port 3000')
 });

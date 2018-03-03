@@ -32,13 +32,19 @@ let  UserSchema = new mongoose.Schema({
   }]
 });
 
+// UserSchema.methods alows us to make custom methods for the instance of the function
+// constructor.
+
+// UserSchema.statics allows us to make custom methods for the the funciton constructor object
+// itself.
+
 // method which specifies the data to be returned.
 UserSchema.methods.toJSON = function() {
   let userObject = this.toObject();
    return _.pick(userObject, ['email', 'password'])
 }
 
-// to set custom methods.
+// to set custom methods for the instance of the object model.
 UserSchema.methods.generateAuthToken = function () {
   let user = this;
   let access = 'auth'; // just a string.
@@ -52,6 +58,32 @@ UserSchema.methods.generateAuthToken = function () {
   // we return the save method, so that we could chain other promise callbacks .
   return user.save().then(() => {
     return token;
+  })
+}
+
+// custom method for the object model.
+UserSchema.statics.findByToken = function(token) {
+  let Users = this;
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, '123456')
+  } catch (e) {
+    return Promise.reject()
+    // does the exact thing as
+    /*
+    return new Promise((resolve, reject) => {
+      reject();
+  })
+    */
+  }
+
+// here we return the authenticated user.
+  // this returns a promise, so we can chain then calls to it.
+  return Users.findOne({
+    '_id': decoded._id,
+    'tokens.token': token, // we query using '' when we need to access a child property.i.e. when we use the dot operator.
+    'tokens.access': 'auth'
   })
 }
 
