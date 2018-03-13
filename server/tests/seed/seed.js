@@ -4,18 +4,21 @@ const jwt = require('jsonwebtoken');
 
 const {ObjectID} = require('mongodb');
 
+const userOneId = new ObjectID();
+const userTwoId = new ObjectID();
+
 const todos = [{
   _id: new ObjectID(),
   text: 'First test todo',
+  _creator: userOneId
 }, {
   _id: new ObjectID(),
   text: 'Second test todo',
   completed: true,
-  completedAt: 33333333
+  completedAt: 33333333,
+  _creator: userTwoId
 }]
 
-const userOneId = new ObjectID();
-const userTwoId = new ObjectID();
 const users = [{
   _id: userOneId,
   email: 'justdvnsh@example.com',
@@ -28,7 +31,11 @@ const users = [{
 {
   _id: userTwoId,
   email: 'jea@example.com',
-  password: '123bca'
+  password: '123bca',
+  tokens: [{
+    access: 'auth',
+    token: jwt.sign({_id: userTwoId, access: 'auth'}, '123456').toString()
+  }]
 }]
 // this funciton is called before each test , because we assume that the
 // databse is empty before each test.

@@ -16,9 +16,10 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
-app.post('/todos', (req, res) => {
+app.post('/todos', authenticate, (req, res) => {
   let todo = new Todo({
-    text: req.body.text
+    text: req.body.text,
+    _creator: req.user._id
   });
   todo.save().then((result) => {
     res.send(result);
@@ -27,8 +28,10 @@ app.post('/todos', (req, res) => {
   })
 })
 
-app.get('/todos', (req, res) => {
-  Todo.find().then((result) => {
+app.get('/todos', authenticate, (req, res) => {
+  Todo.find({
+    _creator: req.user._id
+  }).then((result) => {
     res.status(200).send({result})
   }, (e) => {
     res.status(400).send(e)
@@ -41,7 +44,10 @@ app.get('/todos/:id', (req, res) => {
   if (!ObjectID.isValid(id)){ // to check if the id is valid
     return res.status(404).send('ID not valid.')
   }
-  Todo.findById(id).then((result) => {
+  Todo.findOne({
+    _id: id,
+    _creator: req.user._id
+  }).then((result) => {
     if (!result){
       return res.status(404).send()
     }
@@ -56,7 +62,10 @@ app.delete('/todos/:id', (req, res) => {
   if (!ObjectID.isValid(id)){
     return res.status(400).send('Id not valid')
   }
-  Todo.findByIdAndRemove(id).then((result) => {
+  Todo.findOneAndRemove({
+    _id: id,
+    _creator: req.user._id
+  }).then((result) => {
     if (!result) {
       return res.status(400).send('ID not in the database')
     }
@@ -83,7 +92,7 @@ app.patch('/todos/:id', (req, res) => {
     body.completedAt = null
   }
   // we specify the item we want to set and if we want the updated document back
-  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((result) => {
+  Todo.findOneAndUpdate({_id: id, _creator: req.user._id}, {$set: body}, {new: true}).then((result) => {
     if (!result) {
       return res.status(400).send('ID not in the database')
     }
